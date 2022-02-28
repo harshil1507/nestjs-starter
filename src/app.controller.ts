@@ -4,11 +4,14 @@ import {
   Get,
   Post,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { LocalStrategy } from './auth/local.strategy';
 import { CreateUserDto } from './user/dto/create-user.dto';
 
 @Controller()
@@ -24,8 +27,11 @@ export class AppController {
   }
 
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Body() body: { email: string; password: string }) {
+    const user = await this.authService.validateUser(body.email, body.password);
+    if (!user) throw new UnauthorizedException();
+    console.log(new Date());
+    return await this.authService.login(user);
   }
 
   @Post('signup')
@@ -34,9 +40,9 @@ export class AppController {
     return await this.authService.login(user);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get('profile')
+  // getProfile(@Request() req) {
+  //   return req.user;
+  // }
 }

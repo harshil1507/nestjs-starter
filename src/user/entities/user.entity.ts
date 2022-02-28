@@ -1,5 +1,13 @@
+import { Account } from 'src/account/entities/account.entity';
 import { Role } from 'src/enum/role.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Profile } from 'src/profile/entities/profile.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('user')
 export class User {
@@ -15,6 +23,9 @@ export class User {
   @Column({ nullable: false, type: 'enum', enum: Role, default: Role.User })
   role: string;
 
+  @Column({ default: false })
+  isVerified: boolean;
+
   @Column('timestamp with time zone', {
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -24,4 +35,12 @@ export class User {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  @JoinColumn()
+  profile: Profile;
+
+  @OneToOne(() => Account, (account) => account.user)
+  @JoinColumn()
+  account: Account;
 }

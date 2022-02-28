@@ -8,6 +8,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profile/profile.module';
+import { AccountModule } from './account/account.module';
 console.log(path.join(__dirname, '/**/*.entity{.ts,.js}'));
 
 @Module({
@@ -56,6 +58,8 @@ console.log(path.join(__dirname, '/**/*.entity{.ts,.js}'));
     }),
     UserModule,
     AuthModule,
+    ProfileModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService],
