@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { AccountModule } from './account/account.module';
+import { TokenModule } from './token/token.module';
 console.log(path.join(__dirname, '/**/*.entity{.ts,.js}'));
 
 @Module({
@@ -34,6 +35,7 @@ console.log(path.join(__dirname, '/**/*.entity{.ts,.js}'));
         SALT: Joi.number().required(),
         JWT_SECRET: Joi.string().required(),
         TYPEORM_RUN_MIGRATION: Joi.string().required(),
+        TOKEN_EXPIRY: Joi.number().required().default(15),
       }),
       validationOptions: {
         // allowUnknown: false,
@@ -60,6 +62,7 @@ console.log(path.join(__dirname, '/**/*.entity{.ts,.js}'));
     AuthModule,
     ProfileModule,
     AccountModule,
+    TokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

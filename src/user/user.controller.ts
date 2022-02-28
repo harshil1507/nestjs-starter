@@ -12,6 +12,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { VerifyUserDto } from './dto/verify-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -44,5 +45,10 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Post('/verify')
+  async verify(@Body() verifyUserDto: VerifyUserDto) {
+    return await this.userService.verifyUser(verifyUserDto);
   }
 }

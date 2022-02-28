@@ -16,4 +16,12 @@ export const ErrorHelper = {
   AccountCreateError: 'Error in creating account',
   AccountFetchError: 'Error in fetching account',
   AccountNotFound: 'Account not found',
+
+  TokenCreateError: 'Error in creating token',
+  TokenNotFound: 'Token not found',
+  TokenFetchError: 'Error in fetching token',
+  TokenDeleteError: 'Error in deleting token',
+  TokenExpiryError: 'Token is expired',
+
+  UserVerifyError: 'Error in verifying user',
 };

@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ErrorHelper } from 'src/helpers/errors.const';
+import { ErrorHelper } from 'src/helpers/errors.message';
 import { User } from 'src/user/entities/user.entity';
 import { AccountRepository } from './entities/account.repository';
 

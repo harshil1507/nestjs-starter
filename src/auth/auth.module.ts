@@ -5,6 +5,8 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountService } from 'src/account/account.service';
 import { AccountRepository } from 'src/account/entities/account.repository';
+import { TokenRepository } from 'src/token/entity/token.repository';
+import { TokenService } from 'src/token/token.service';
 import { UserRepository } from 'src/user/entities/user.repository';
 import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
@@ -24,7 +26,11 @@ import { LocalStrategy } from './local.strategy';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([UserRepository, AccountRepository]),
+    TypeOrmModule.forFeature([
+      UserRepository,
+      AccountRepository,
+      TokenRepository,
+    ]),
   ],
   providers: [
     AuthService,
@@ -32,6 +38,7 @@ import { LocalStrategy } from './local.strategy';
     JwtStrategy,
     UserService,
     AccountService,
+    TokenService,
   ],
   exports: [AuthService],
 })

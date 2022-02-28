@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ErrorHelper } from 'src/helpers/errors.const';
+import { ErrorHelper } from 'src/helpers/errors.message';
 import { UserService } from 'src/user/user.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';

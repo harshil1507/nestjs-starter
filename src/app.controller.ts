@@ -30,7 +30,6 @@ export class AppController {
   async login(@Body() body: { email: string; password: string }) {
     const user = await this.authService.validateUser(body.email, body.password);
     if (!user) throw new UnauthorizedException();
-    console.log(new Date());
     return await this.authService.login(user);
   }
 

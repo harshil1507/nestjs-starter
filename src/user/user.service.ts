@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -9,10 +10,13 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { AccountService } from 'src/account/account.service';
-import { ErrorHelper } from 'src/helpers/errors.const';
+import { TokenTypeEnum } from 'src/enum/token-type.enum';
+import { ErrorHelper } from 'src/helpers/errors.message';
+import { TokenService } from 'src/token/token.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { VerifyUserDto } from './dto/verify-user.dto';
 import { User } from './entities/user.entity';
 import { UserRepository } from './entities/user.repository';
 
@@ -23,6 +27,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly configService: ConfigService,
     private readonly accountService: AccountService,
+    private readonly tokenService: TokenService,
   ) {}
   logger = new Logger(UserService.name);
 
@@ -38,6 +43,10 @@ export class UserService {
         password: hashedPassword,
       });
       await this.accountService.create(user);
+      await this.tokenService.create(
+        createUserDto.email.toLowerCase(),
+        TokenTypeEnum.VerifyToken,
+      );
       return user;
     } catch (error) {
       this.logger.error(error.message);
@@ -131,7 +140,9 @@ export class UserService {
 
   async findOneByEmail(email: string) {
     try {
-      const user = await this.userRepository.findOne({ where: { email } });
+      const user = await this.userRepository.findOne({
+        where: { email: email.toLowerCase() },
+      });
       if (!user) throw new NotFoundException(ErrorHelper.UserNotFound);
       return user;
     } catch (error) {
@@ -150,7 +161,9 @@ export class UserService {
 
   async checkEmailInUse(email: string) {
     try {
-      const user = await this.userRepository.findOne({ where: { email } });
+      const user = await this.userRepository.findOne({
+        where: { email: email.toLowerCase() },
+      });
       if (!user) return false;
       return true;
     } catch (error) {
@@ -200,6 +213,43 @@ export class UserService {
         {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
           message: ErrorHelper.UserFetchError,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async verifyUser(verifyUserDto: VerifyUserDto) {
+    try {
+      const nowTime = new Date();
+      const token = await this.tokenService.find(
+        verifyUserDto.email,
+        verifyUserDto.verificationCode,
+      );
+      if (!token) throw new Error(ErrorHelper.TokenNotFound);
+      if (nowTime > new Date(token.expiry))
+        throw new Error(ErrorHelper.TokenExpiryError);
+      await this.userRepository.update(
+        { email: verifyUserDto.email.toLowerCase() },
+        { isVerified: true },
+      );
+      return {
+        email: verifyUserDto.email.toLowerCase(),
+        isVerified: true,
+      };
+    } catch (error) {
+      this.logger.error(error.message);
+
+      if (error.message === ErrorHelper.TokenExpiryError)
+        throw new BadRequestException(ErrorHelper.TokenExpiryError);
+
+      if (error.message === ErrorHelper.TokenNotFound)
+        throw new BadRequestException(ErrorHelper.TokenNotFound);
+
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: ErrorHelper.UserVerifyError,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
